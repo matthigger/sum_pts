@@ -1,7 +1,9 @@
+import pathlib
 import re
 from copy import deepcopy
 
 import pandas as pd
+import json
 
 
 class PointCounter:
@@ -9,6 +11,21 @@ class PointCounter:
 
     def __init__(self):
         self.df = pd.DataFrame()
+        self.df.index.name = 'part'
+
+    def parse_file(self, file, **kwargs):
+        file = pathlib.Path(file)
+        with open(file) as f:
+            if file.suffix == '.ipynb':
+                # read in json file
+                json_dict = json.load(f)
+
+                # parse each cell
+                for cell in json_dict['cells']:
+                    self.parse(s=''.join(cell['source']), **kwargs)
+            else:
+                # parse contents of file
+                self.parse(f.read(), **kwargs)
 
     def parse(self, s, item_name_rm='+&,'):
         for line in re.finditer('#.*\(.*(pts?|points?)\)', s,
@@ -61,14 +78,14 @@ class PointCounter:
                     f'duplicate entry for {prob_name} {item_name}'
 
         # record item_pts
-        self.df.loc[prob_name, item_name] = item_pts
+        self.df.loc[prob_name, item_name] = float(item_pts)
 
     def _get_output_df(self):
         df = deepcopy(self.df)
 
         # add total final col (if there are multiple cols)
         if df.shape[1] > 1:
-            df['problem total'] = df.sum(axis=1)
+            df['part total'] = df.sum(axis=1)
 
         # add total final row
         df.loc['total', :] = df.sum(axis=0)

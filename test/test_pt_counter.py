@@ -1,15 +1,26 @@
-import pathlib
+import filecmp
+import tempfile
 
 from sum_pts.pt_counter import *
 
-file_ex_hw = pathlib.Path('.') / 'ex' / 'ex_hw.py'
-with open(file_ex_hw) as f:
-    s_ex_hw = f.read()
+folder = pathlib.Path('.') / 'ex'
 
 
 def test_point_counter():
-    pc = PointCounter()
-    pc.parse(s_ex_hw)
+    for case_folder in folder.glob('case*'):
+        # get first py and ipynb file in each case folder (its unique)
+        file_list = [next(iter(case_folder.glob(pattern)))
+                     for pattern in ('*.py', '*.ipynb')]
+        for file in file_list:
+            pc = PointCounter()
+            pc.parse_file(file)
 
-    # print
-    print('hi')
+            f_csv = tempfile.NamedTemporaryFile(suffix='.csv').name
+            f_md = tempfile.NamedTemporaryFile(suffix='.md').name
+
+            pc.to_csv(f_csv)
+            with open(f_md, 'w') as f:
+                print(pc.to_markdown(), file=f)
+
+            assert filecmp.cmp(f_csv, case_folder / 'expected.csv')
+            assert filecmp.cmp(f_md, case_folder / 'expected.md')
