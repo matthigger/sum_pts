@@ -33,7 +33,7 @@ to generate a markdown table which sums all points in assignment:
     | part 3 | 14 |        | 3.0                             |           17 |
     | total  | 38 | 2.0    | 3.0                             |           43 |
 
-You can write this to a markdown or csv file with the `-m` or `-c` flags.
+You can write this to a markdown or csv file with the `-m` or `-c` flags (see output examples in [case0](test/ex/case0)).
 
 ## Notes:
 - capitalization doesn't count

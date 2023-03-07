@@ -14,7 +14,7 @@ parser.add_argument('-q', '--quiet', action='store_true', dest='quiet',
                     help='disables printing markdown output to command line')
 
 
-def main(args):
+def main(args=None):
     args = parser.parse_args(args)
 
     pc = sum_pts.PointCounter()
