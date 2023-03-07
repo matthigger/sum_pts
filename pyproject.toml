@@ -1,0 +1,24 @@
+[project]
+name = "sum_pts"
+version = "0.0.1"
+authors = [
+    { name = "Matt Higger", email = "matt.higger@gmail.com" },
+]
+description = "counts assignment points"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "pipreqs"
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project.urls]
+"Homepage" = "https://github.com/matthigger/sum_pts"
