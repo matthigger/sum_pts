@@ -1,2 +1,4 @@
 /.idea/
 *.pyc
+/sum_pts.egg-info/
+/dist/

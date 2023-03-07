@@ -1,6 +1,6 @@
 [project]
 name = "sum_pts"
-version = "0.0.1"
+version = "0.0.2"
 authors = [
     { name = "Matt Higger", email = "matt.higger@gmail.com" },
 ]
