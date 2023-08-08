@@ -1,9 +1,9 @@
+import json
 import pathlib
 import re
 from copy import deepcopy
 
 import pandas as pd
-import json
 
 
 class PointCounter:
@@ -27,48 +27,45 @@ class PointCounter:
                 # parse contents of file
                 self.parse(f.read(), **kwargs)
 
-    def parse(self, s, item_name_rm='+&,'):
-        for line in re.finditer('#.*\(.*(pts?|points?)\)', s,
+    def parse(self, s, pt_split='[+&,]', left='\(', right='\)', prefix='#',
+              points='(pts?|points?)'):
+        """ parses text to find points
+
+        # part 1 (3 pt + 10 extra credit)
+
+        Args:
+            s (str): text to be parsed
+            pt_split (str): python regex representing all seperations
+                between point types (e.g. normal vs extra credit)
+            left (str): python regex matches left of a point block
+            right (str): python regex matches right of point block
+            prefix (str): python regex matches start of line containing points
+            points (str): python regex matches once somewhere within point
+                block
+        """
+        pts_block = f'{left}.*{points}{right}'
+        for line in re.finditer(f'{prefix}.*{pts_block}', s,
                                 flags=re.IGNORECASE):
             line = line.group()
 
             # extract name of problem
-            match_pts = re.search('\(.*(pts?|points?)\)', line,
-                                  flags=re.IGNORECASE)
-            prob_name = line[:match_pts.start()].lstrip('#').strip()
+            match_pts = re.search(f'{pts_block}', line, flags=re.IGNORECASE)
+            prob_name = line[:match_pts.start()]
+            prob_name = re.sub(prefix, '', prob_name, count=1).strip()
 
             # extract point values (per item)
-            str_pts = re.sub('pts?|points?', '', match_pts.group())
-            for s in item_name_rm:
-                str_pts = str_pts.replace(s, '')
-            str_pts = re.sub(' +', ' ', str_pts)
-            list_pts = str_pts[1:-1].strip().split(' ')
+            str_pts = re.sub(points, '', match_pts.group())
+            str_pts = re.sub(left, '', str_pts, count=1)
+            str_pts = re.sub(right + '$', '', str_pts, count=1)
+            for s in re.split(pt_split, str_pts):
+                s.strip()
+                item_pts_match = re.search('\d+\.?\d*', s.strip())
 
-            item_pts = list_pts[0]
-            item_name_list = list()
-            for s in list_pts[1:]:
-                try:
-                    # try to convert beginning of next item
-                    float(s)
-
-                    # record old item
-                    self._record(prob_name=prob_name,
-                                 item_name=' '.join(item_name_list),
-                                 item_pts=item_pts)
-
-                    # prep next item
-                    item_pts = float(s)
-                    item_name_list = list()
-
-                except ValueError:
-                    # string isn't point value of following item, its part
-                    # of name of current item
-                    item_name_list.append(s)
-
-            # record final item
-            self._record(prob_name=prob_name,
-                         item_name=' '.join(item_name_list),
-                         item_pts=item_pts)
+                # record final item
+                item_pts = item_pts_match.group()
+                item_name = s.replace(item_pts, '').strip()
+                self._record(prob_name=prob_name, item_name=item_name,
+                             item_pts=item_pts)
 
     def _record(self, prob_name, item_name, item_pts, check_doesnt_exist=True):
         if check_doesnt_exist:
@@ -77,8 +74,8 @@ class PointCounter:
                 assert pd.isna(self.df.loc[prob_name, item_name]), \
                     f'duplicate entry for {prob_name} {item_name}'
 
-        # record item_pts
-        self.df.loc[prob_name, item_name] = float(item_pts)
+            # record item_pts
+            self.df.loc[prob_name, item_name] = float(item_pts)
 
     def _get_output_df(self):
         df = deepcopy(self.df)

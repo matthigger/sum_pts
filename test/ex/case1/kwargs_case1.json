@@ -1,0 +1,6 @@
+{
+    "prefix": "# custom-prefix",
+    "left": "left",
+    "right": "right",
+    "points": "(penguins|pts)"
+}
