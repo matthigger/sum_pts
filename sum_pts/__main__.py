@@ -19,13 +19,14 @@ def main(args=None):
 
     pc = sum_pts.PointCounter()
     pc.parse_file(args.file_in)
+    df = pc.to_df()
 
     if args.file_csv is not None:
         # write csv to file
-        pc.to_csv(args.file_csv)
+        df.to_csv(args.file_csv)
 
     # get markdown table
-    s_markdown = pc.to_markdown()
+    s_markdown = df.to_markdown()
 
     if not args.quiet:
         print(s_markdown)

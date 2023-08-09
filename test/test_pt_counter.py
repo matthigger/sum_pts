@@ -1,6 +1,3 @@
-import filecmp
-import tempfile
-
 from sum_pts.pt_counter import *
 
 folder = pathlib.Path('.') / 'ex'
@@ -9,6 +6,12 @@ with open(folder / 'case1/kwargs_case1.json', 'w') as f:
     json.dump({'prefix': '# custom-prefix',
                'left': 'left',
                'right': 'right',
+               'points': '(penguins|pts)'}, indent=4, fp=f)
+
+with open(folder / 'ca2/kwargs_case2.json', 'w') as f:
+    json.dump({'prefix': '\prob',
+               'left': '\[',
+               'right': '\]',
                'points': '(penguins|pts)'}, indent=4, fp=f)
 
 
@@ -28,15 +31,14 @@ def test_point_counter():
             kwargs = dict()
 
         for file in file_list:
+            # observed
             pc = PointCounter()
             pc.parse_file(file, **kwargs)
+            df_obs = pc.to_df()
 
-            f_csv = tempfile.NamedTemporaryFile(suffix='.csv').name
-            f_md = tempfile.NamedTemporaryFile(suffix='.md').name
+            # expected
+            df_exp = pd.read_csv(case_folder / 'expected.csv', index_col=0)
+            df_exp.rename({'Unnamed: 1': ''}, axis=1, inplace=True)
+            df_exp.fillna('', inplace=True)
 
-            pc.to_csv(f_csv)
-            with open(f_md, 'w') as f:
-                print(pc.to_markdown(), file=f)
-
-            assert filecmp.cmp(f_csv, case_folder / 'expected.csv')
-            assert filecmp.cmp(f_md, case_folder / 'expected.md')
+            pd.testing.assert_frame_equal(df_obs, df_exp, check_dtype=False)

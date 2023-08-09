@@ -44,22 +44,21 @@ class PointCounter:
                 block
         """
         pts_block = f'{left}.*{points}{right}'
-        for line in re.finditer(f'{prefix}.*{pts_block}', s,
+        for line in re.finditer(f'{prefix}.*{pts_block}.*', s,
                                 flags=re.IGNORECASE):
             line = line.group()
 
             # extract name of problem
-            match_pts = re.search(f'{pts_block}', line, flags=re.IGNORECASE)
-            prob_name = line[:match_pts.start()]
+            prob_name = re.sub(pts_block, '', line, flags=re.IGNORECASE)
             prob_name = re.sub(prefix, '', prob_name, count=1).strip()
 
             # extract point values (per item)
-            str_pts = re.sub(points, '', match_pts.group())
+            str_pts = re.search(pts_block, line, flags=re.IGNORECASE).group()
+            str_pts = re.sub(points, '', str_pts)
             str_pts = re.sub(left, '', str_pts, count=1)
             str_pts = re.sub(right + '$', '', str_pts, count=1)
             for s in re.split(pt_split, str_pts):
-                s.strip()
-                item_pts_match = re.search('\d+\.?\d*', s.strip())
+                item_pts_match = re.search('\d+\.?\d*', s)
 
                 # record final item
                 item_pts = item_pts_match.group()
@@ -77,7 +76,7 @@ class PointCounter:
             # record item_pts
             self.df.loc[prob_name, item_name] = float(item_pts)
 
-    def _get_output_df(self):
+    def to_df(self):
         df = deepcopy(self.df)
 
         # add total final col (if there are multiple cols)
@@ -90,9 +89,3 @@ class PointCounter:
         df.fillna('', inplace=True)
 
         return df
-
-    def to_csv(self, *args, **kwargs):
-        self._get_output_df().to_csv(*args, **kwargs)
-
-    def to_markdown(self):
-        return self._get_output_df().to_markdown()

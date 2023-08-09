@@ -1,4 +1,4 @@
-# custom-prefix Part 1 left10 ptsright
+# custom-prefix Part 1 left10 ptsright name-of-part-1
 # Part 1 (10 points) <- doesn't have new custom prefix
 # some text or code here
 
