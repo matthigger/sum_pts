@@ -43,7 +43,7 @@ class PointCounter:
             points (str): python regex matches once somewhere within point
                 block
         """
-        pts_block = f'{left}.*{points}{right}'
+        pts_block = f'{left}.*{points}.*{right}'
         for line in re.finditer(f'{prefix}.*{pts_block}.*', s,
                                 flags=re.IGNORECASE):
             line = line.group()

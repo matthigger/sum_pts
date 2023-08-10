@@ -2,3 +2,5 @@
 *.pyc
 /sum_pts.egg-info/
 /dist/
+*tmp*
+*checkpoint.ipynb

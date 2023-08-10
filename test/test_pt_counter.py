@@ -8,11 +8,11 @@ with open(folder / 'case1/kwargs_case1.json', 'w') as f:
                'right': 'right',
                'points': '(penguins|pts)'}, indent=4, fp=f)
 
-with open(folder / 'ca2/kwargs_case2.json', 'w') as f:
-    json.dump({'prefix': '\prob',
+with open(folder / 'case2/kwargs_case2.json', 'w') as f:
+    json.dump({'prefix': ' *\\\\prob',
                'left': '\[',
                'right': '\]',
-               'points': '(penguins|pts)'}, indent=4, fp=f)
+               'points': 'pts'}, indent=4, fp=f)
 
 
 def test_point_counter():
@@ -38,7 +38,9 @@ def test_point_counter():
 
             # expected
             df_exp = pd.read_csv(case_folder / 'expected.csv', index_col=0)
-            df_exp.rename({'Unnamed: 1': ''}, axis=1, inplace=True)
+            for col in df_exp.columns:
+                if 'Unnamed' in col:
+                    df_exp.rename({col: ''}, axis=1, inplace=True)
             df_exp.fillna('', inplace=True)
 
             pd.testing.assert_frame_equal(df_obs, df_exp, check_dtype=False)
