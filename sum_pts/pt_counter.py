@@ -28,7 +28,7 @@ class PointCounter:
                 self.parse(f.read(), **kwargs)
 
     def parse(self, s, pt_split='[+&,]', left='\(', right='\)', prefix='#',
-              points='([Pp]ts?|[Pp]oints?)', ignore_case=False):
+              points='([Pp]ts?|[Pp]oints?)', ignore_case=False, rm_list=None):
         """ parses text to find points
 
         # part 1 (3 pt + 10 extra credit)
@@ -43,30 +43,37 @@ class PointCounter:
             points (str): python regex matches once somewhere within point
                 block
             ignore_case (bool): ignores case of inputs if passed
+            rm_list (list): list of regex strings to remove from
         """
 
         flag_dict = {'flags': re.IGNORECASE} if ignore_case else dict()
+
+        if rm_list is None:
+            rm_list = list()
 
         pts_block = f'{left}.*{points}.*{right}'
         for line in re.finditer(f'{prefix}.*{pts_block}.*', s, **flag_dict):
             line = line.group()
 
             # extract name of problem
-            prob_name = re.sub(pts_block, '', line, **flag_dict)
-            prob_name = re.sub(prefix, '', prob_name, count=1,
-                               **flag_dict).strip()
+            prob_name = line
+            for s in [pts_block, prefix] + rm_list:
+                prob_name = re.sub(s, '', prob_name, **flag_dict).strip()
 
-            # extract point values (per item)
+            # extract & clean point values (all point types)
             str_pts = re.search(pts_block, line, **flag_dict).group()
-            str_pts = re.sub(points, '', str_pts, **flag_dict)
-            str_pts = re.sub(left, '', str_pts, count=1, **flag_dict)
-            str_pts = re.sub(right + '$', '', str_pts, count=1, **flag_dict)
-            for s in re.split(pt_split, str_pts, **flag_dict):
-                item_pts_match = re.search('\d+\.?\d*', s, **flag_dict)
+            for s in ['^' + left, right + '$', points] + rm_list:
+                str_pts = re.sub(s, '', str_pts, **flag_dict)
 
-                # record final item
-                item_pts = item_pts_match.group()
+            # record point values (per point type)
+            for s in re.split(pt_split, str_pts, **flag_dict):
+                # extract pts
+                item_pts = re.search('\d+\.?\d*', s, **flag_dict).group()
+
+                # extract name of points
                 item_name = s.replace(item_pts, '').strip()
+
+                # record
                 self._record(prob_name=prob_name, item_name=item_name,
                              item_pts=item_pts)
 

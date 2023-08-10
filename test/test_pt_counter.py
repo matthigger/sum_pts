@@ -12,7 +12,10 @@ with open(folder / 'case2/kwargs_case2.json', 'w') as f:
     json.dump(dict(prefix=' *\\\\prob',
                    left='\[',
                    right='\]',
-                   points='pts'), indent=4, fp=f)
+                   points='pts',
+                   rm_list=['\\(\d+.?\d* each\\)',
+                            '\\((\d+.?\d*,? ?)+\\)',
+                            '\\{', '\\}', ':']), indent=4, fp=f)
 
 with open(folder / 'case3/kwargs_case3.json', 'w') as f:
     json.dump(dict(ignore_case=True,

@@ -1,8 +1,8 @@
-part,(3 each),(5,,),part total
-{: English to Logic},18.0,,,,18.0
-{: Arithmetic \& Logic},15.0,,,,15.0
-{ : Tarski World Predicates \& Quantifiers},24.0,,,,24.0
-{: Tarski World Conditionals},18.0,,,,18.0
-{: Vending Machine},,13.0,4.0,4.0,21.0
-{: Return of English to Logic },12.0,,,,12.0
-total,87.0,13.0,4.0,4.0,108.0
+part,
+English to Logic,18.0
+Arithmetic \& Logic,15.0
+Tarski World Predicates \& Quantifiers,24.0
+Tarski World Conditionals,18.0
+Vending Machine,13.0
+Return of English to Logic,12.0
+total,100.0
