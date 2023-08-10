@@ -28,7 +28,7 @@ class PointCounter:
                 self.parse(f.read(), **kwargs)
 
     def parse(self, s, pt_split='[+&,]', left='\(', right='\)', prefix='#',
-              points='(pts?|points?)'):
+              points='([Pp]ts?|[Pp]oints?)', ignore_case=False):
         """ parses text to find points
 
         # part 1 (3 pt + 10 extra credit)
@@ -42,23 +42,27 @@ class PointCounter:
             prefix (str): python regex matches start of line containing points
             points (str): python regex matches once somewhere within point
                 block
+            ignore_case (bool): ignores case of inputs if passed
         """
+
+        flag_dict = {'flags': re.IGNORECASE} if ignore_case else dict()
+
         pts_block = f'{left}.*{points}.*{right}'
-        for line in re.finditer(f'{prefix}.*{pts_block}.*', s,
-                                flags=re.IGNORECASE):
+        for line in re.finditer(f'{prefix}.*{pts_block}.*', s, **flag_dict):
             line = line.group()
 
             # extract name of problem
-            prob_name = re.sub(pts_block, '', line, flags=re.IGNORECASE)
-            prob_name = re.sub(prefix, '', prob_name, count=1).strip()
+            prob_name = re.sub(pts_block, '', line, **flag_dict)
+            prob_name = re.sub(prefix, '', prob_name, count=1,
+                               **flag_dict).strip()
 
             # extract point values (per item)
-            str_pts = re.search(pts_block, line, flags=re.IGNORECASE).group()
-            str_pts = re.sub(points, '', str_pts)
-            str_pts = re.sub(left, '', str_pts, count=1)
-            str_pts = re.sub(right + '$', '', str_pts, count=1)
-            for s in re.split(pt_split, str_pts):
-                item_pts_match = re.search('\d+\.?\d*', s)
+            str_pts = re.search(pts_block, line, **flag_dict).group()
+            str_pts = re.sub(points, '', str_pts, **flag_dict)
+            str_pts = re.sub(left, '', str_pts, count=1, **flag_dict)
+            str_pts = re.sub(right + '$', '', str_pts, count=1, **flag_dict)
+            for s in re.split(pt_split, str_pts, **flag_dict):
+                item_pts_match = re.search('\d+\.?\d*', s, **flag_dict)
 
                 # record final item
                 item_pts = item_pts_match.group()

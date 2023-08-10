@@ -3,16 +3,20 @@ from sum_pts.pt_counter import *
 folder = pathlib.Path('.') / 'ex'
 
 with open(folder / 'case1/kwargs_case1.json', 'w') as f:
-    json.dump({'prefix': '# custom-prefix',
-               'left': 'left',
-               'right': 'right',
-               'points': '(penguins|pts)'}, indent=4, fp=f)
+    json.dump(dict(prefix='# custom-prefix',
+                   left='left',
+                   right='right',
+                   points='(penguins|pts)'), indent=4, fp=f)
 
 with open(folder / 'case2/kwargs_case2.json', 'w') as f:
-    json.dump({'prefix': ' *\\\\prob',
-               'left': '\[',
-               'right': '\]',
-               'points': 'pts'}, indent=4, fp=f)
+    json.dump(dict(prefix=' *\\\\prob',
+                   left='\[',
+                   right='\]',
+                   points='pts'), indent=4, fp=f)
+
+with open(folder / 'case3/kwargs_case3.json', 'w') as f:
+    json.dump(dict(ignore_case=True,
+                   points='(pts?|points?)'), indent=4, fp=f)
 
 
 def test_point_counter():

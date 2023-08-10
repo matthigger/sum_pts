@@ -1,0 +1,4 @@
+{
+    "ignore_case": true,
+    "points": "(pts?|points?)"
+}
