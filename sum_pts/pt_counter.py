@@ -27,15 +27,15 @@ class PointCounter:
                 # parse contents of file
                 self.parse(f.read(), **kwargs)
 
-    def parse(self, s, pt_split='[+&,]', left='\(', right='\)', prefix='#',
-              points='([Pp]ts?|[Pp]oints?)', ignore_case=False, rm_list=None):
+    def parse(self, s, pt_split=None, left=None, right=None, prefix=None,
+              points=None, ignore_case=None, rm_list=None):
         """ parses text to find points
 
         # part 1 (3 pt + 10 extra credit)
 
         Args:
             s (str): text to be parsed
-            pt_split (str): python regex representing all seperations
+            pt_split (str): python regex representing all separations
                 between point types (e.g. normal vs extra credit)
             left (str): python regex matches left of a point block
             right (str): python regex matches right of point block
@@ -45,13 +45,29 @@ class PointCounter:
             ignore_case (bool): ignores case of inputs if passed
             rm_list (list): list of regex strings to remove from
         """
+        # defaults stored here to avoid redundancy in __main__
+        if pt_split is None:
+            pt_split = '[+&,]'
+        if left is None:
+            left = '\('
+        if right is None:
+            right = '\)'
+        if prefix is None:
+            prefix = '#'
+        if points is None:
+            points = '([Pp]ts?|[Pp]oints?)'
+        if rm_list is None:
+            rm_list = list()
+        if ignore_case is None:
+            ignore_case = False
 
         flag_dict = {'flags': re.IGNORECASE} if ignore_case else dict()
 
-        if rm_list is None:
-            rm_list = list()
-
+        # a pts_block contains all point value (and type) information.
+        # e.g. "(3 points + 1 extra credit)" has 3 '' points and 1 'extra
+        # credit' points
         pts_block = f'{left}.*{points}.*{right}'
+
         for line in re.finditer(f'{prefix}.*{pts_block}.*', s, **flag_dict):
             line = line.group()
 
