@@ -21,6 +21,9 @@ with open(folder / 'case3/kwargs_case3.json', 'w') as f:
     json.dump(dict(ignore_case=True,
                    points='(pts?|points?)'), indent=4, fp=f)
 
+with open(folder / 'case4/kwargs_case4.json', 'w') as f:
+    json.dump(dict(left=' \\('), indent=4, fp=f)
+
 
 def test_point_counter():
     for case_folder in folder.glob('case*'):
